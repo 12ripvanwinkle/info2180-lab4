@@ -1,46 +1,35 @@
-const ax = new XMLHttpRequest();
-
 document.getElementById('search').addEventListener('click', function() {
-    // Perform an AJAX request using fetch()
-    // fetch('http://localhost/info2180-lab4/superheroes.php')
-    //     .then(response => response.text()) // Get the response as text (HTML content)
-    //     .then(data => {
-    //         // Create an alert showing the superheroes
-    //         alert('Superheroes: \n' + data);
-    //     })
-    //     .catch(error => {
-    //         console.error('Error fetching superheroes:', error);
-    //     });
+    const superheroInput = document.getElementById('superhero').value.trim();
 
-    // $.ajax({
-    //     url: "http://localhost/info2180-lab4/superheroes.php",
-    //     method: "GET",
-    //     success: function(result) {
-    //         alert(result);
-    //     },
-    //     error: function(xhr, status, error) {
-    //         console.error("Error:", status, error);
-    //         alert("Failed to retrieve data: " + status + " - " + error);
-    //     }
-    // });
-
-    ax.onreadystatechange = solution;
-    
-    ax.open('GET','superheroes.php');
-    ax.send();
-    
+    // Check if the input is empty
+    if (superheroInput === '') {
+        // If the input is empty, perform the fetch to get the full list of superheroes
+        fetch('superheroes.php')
+            .then(response => response.text()) // Get the response as text (HTML content)
+            .then(data => {
+                // Assuming the response is a list of superheroes in <li> tags (from your PHP response)
+                document.getElementById('result').innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error fetching superheroes:', error);
+                document.getElementById('result').innerHTML = 'Error fetching superheroes.';
+            });
+    } else {
+        // If the input is not empty, perform the fetch to search for a specific superhero
+        fetch(`superheroes.php?query=${encodeURIComponent(superheroInput)}`)
+            .then(response => response.text()) // Get the response as text (HTML content)
+            .then(data => {
+                // Check if a superhero is returned or not
+                if (data === 'No superhero found.') {
+                    document.getElementById('result').innerHTML = 'Superhero Not Found';
+                } else {
+                    // Display the superhero's data (Alias, Name, Biography) in the specified format
+                    document.getElementById('result').innerHTML = data;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching superhero data:', error);
+                document.getElementById('result').innerHTML = 'Error fetching superhero data.';
+            });
+    }
 });
-
-function solution()
-{
-        if (ax.readyState === XMLHttpRequest.DONE)
-        {
-            if (ax.status === 200)
-            {
-                let response = ax.responseText;
-                alert(response);
-            }
-        }
-
-    
-}
